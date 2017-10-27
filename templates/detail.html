@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>It's my ass!</title>
+    <script src="{% static 'js/vue1.js'%}"></script>
+    <script src="{% static 'js/jquery-3.2.1.min.js'%}"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/vue"></script>-->
+    <script src="{% static 'js/semantic.js' %}"></script>
+    <script src="{% static 'js/reqwest.js'%}"></script>
+
+    <link rel="stylesheet" href="{% static 'css/semantic.css' %}"/>
+
+    <style type="text/css">
+        .ui.right.floated.ui.primary.button{
+          margin-right: 0.3em;
+          margin-left: 0.25em;
+        }
+        .ui.inverted.basic.borderless.menu{
+          margin: 0em 0em;
+        }
+        h1 {color: white}
+    </style>
+
+  </head>
+  <body  id="app" >
+    {# <img class="ui fluid image"src="{% static 'images/a1.png'%}" >#}
+    <!-- <div class="ui inverted vertical masthead left huge aligned segment">
+
+            <div class="ui header">
+            <img src="{% static 'images/logo2.png' %}">
+            学生信息管理系统
+            <span class="ui mini circular image">
+              <img src="{% static 'images/default.png'%}" alt="" />
+            </span>
+              <span class="ui right floated ui primary button">注册</span>
+               <span class="ui right floated ui negative button">注册</span>
+               <span class="ui right floated ui negative button">注册</span>
+            </div>
+
+
+      </div> -->
+      <div class="ui inverted  basic borderless segment menu">
+          <div class="header item">
+              <div class="ui header">
+                  <h1 style="font">学生信息管理系统</h1>
+              </div>
+          </div>
+          <div class="right menu">
+            <div class="item">
+              <h5 class="ui inverted header">
+                <span style="margin-right:20px;">{{ request.user.username }}</span>
+                <div class="ui mini circular image">
+                  <img src="{% static 'images/anon.png'%}" alt="" />
+                </div>
+              </h5>
+            </div>
+            <div class="item">
+              <a href="{% url 'logout' %}" class="ui inverted circular button">登出</a>
+            </div>
+          </div>
+      </div>
+
+
+    <div class="container">
+      <div class="ui menu">
+
+        <div class="item"><i class="database icon"></i></div>
+          <div class="ui simple dropdown item">
+            公告
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <a class="item" href="{% url 'index'%}">公告</a>
+              <a class="item" href="{% url 'edit_page' %}">编辑模式</a>
+            </div>
+          </div>
+          <a class="item" href="{% url 'table_page'%}">课表查询</a>
+          <div class="ui simple dropdown item">
+            #作业
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <a class="item">#作业管理 </a>
+            </div>
+          </div>
+          <a class="item" >#出勤查询</a>
+          <a class="item" href="{% url 'aboutme'%} ">关于本站</a>
+
+        <div class="right menu">
+          <div class="item">
+              <a class="ui primary button" href="{% url 'register' %}">注册</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ui raised text container segment">
+        <h2 class="ui header">{{ article.title }}</h2>
+        <p>{{ article.content }}</p>
+      </div>
+
+
+      <br><br>
+
+    <div class="ui segment container text">
+      <div class="ui header">Comments</div>
+      <div class="ui divider"></div>
+      <div class="ui comments">
+
+        {% if best_commnet %}
+
+          <div class="ui mini red left ribbon label">
+            <i class="icon fire">BEST</i>
+          </div>
+          <div class="best comment">
+            <div class="comment">
+              <a class="avatar">
+                <img src="{% static 'images/anon.png'%}">
+              </a>
+              <div class="content">
+                <a class="author">{{ best_commnet.name }}</a>
+                <div class="metadata">
+                  <span class="date"></span>
+                </div>
+                <div class="text">
+                  {{ best_commnet.content }}
+                </div>
+              </div>
+            </div>
+            <div class="ui divider">
+
+            </div>
+          </div>
+
+        {% endif %}
+
+        {% for com in article.under_comments.all %}
+        {% if com.best_commnet == False %}
+          <div class="comment">
+            <a class="avatar">
+              <img src="{% static 'images/anon.png'%}">
+            </a>
+            <div class="content">
+              <a class="author">{{ com.name }}</a>
+              <div class="metadata">
+                <span class="date"></span>
+              </div>
+              <div class="text">
+                {{ com.content }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+
+      </div>
+      <div class="ui divider"></div>
+      <br>
+      <form class="ui tiny error  form" action="{% url 'commentPOST' article.id %}" method="post">
+        <!-- 这里的 article.id 不是从‘commnetPOST’对应的Views层detail_commnetPOST取得数据，而是从当前页面所对应的Views层detail取得数据-->
+        <!-- ‘commetPOST’起的作用是填充URL不是起着调用-->
+
+        {% if form.errors %}
+          <div class="ui error message">
+            {{ form.errors }}
+          </div>
+            {% for fo in form %}
+              <div class="{{ form.errors|yesno:'error, ' }} filed">
+                {{ fo.label }}
+                {{ fo }}
+              </div>
+            {% endfor %}
+
+        {% else %}
+
+          {% for fo2 in form %}
+            <div class="filed">
+              {{ fo2.label }}
+              {{ fo2 }}
+            </div>
+          {% endfor %}
+
+        {% endif %}
+
+        {% csrf_token %}
+        <br>
+        <button class="ui blue button" type="submit" >提交</button>
+        </form>
+    </div>
+
+{% verbatim %}
+
+{% endverbatim %}
+
+</div>
+
+<!-- <script>
+var vm = new Vue({
+    el:"#app",
+    data:{
+      infos:[] },
+    methods:{
+      get_info:function () {
+        var self = this;
+        reqwest({
+          url:"http://localhost:8000/api/article/?format=json",
+          type:"json",
+          method:"get",
+          success:function (resp) {
+            self.infos = resp
+          }
+        })
+      },
+    },
+    ready:function () {
+      this.get_info()
+    }
+  })
+</script> -->
+
+  </body>
+</html>

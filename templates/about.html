@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>It's my ass!</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    <script src="{% static 'js/vue1.js'%}"></script>
+    <script src="{% static 'js/semantic.js' %}"></script>
+    <script src="{% static 'js/reqwest.js' %}">
+
+    </script>
+    <link rel="stylesheet" href="{% static 'css/semantic.css' %}"/>
+    <style type="text/css">
+        .ui.right.floated.ui.primary.button{
+          margin-right: 0.3em;
+          margin-left: 0.25em;
+        }
+        .ui.inverted.basic.borderless.menu{
+          margin: 0em 0em;
+        }
+        h1 {color: white}
+    </style>
+  </head>
+  <body id="app" >
+    {# <img class="ui fluid image"src="{% static 'images/a1.png'%}" >#}
+
+    <!-- <div class="ui inverted vertical masthead left huge aligned segment">
+          <h1 class="ui inverted header">
+            <img src="{% static 'images/logo2.png' %}">
+            学生信息管理系统
+          </h1>
+      </div> -->
+    <div class="ui inverted  basic borderless segment menu">
+        <div class="header item">
+            <div class="ui header">
+                <h1 style="font">学生信息管理系统</h1>
+            </div>
+        </div>
+        <div class="right menu">
+          <div class="item">
+            <h5 class="ui inverted header">
+              <span style="margin-right:20px;">{{ request.user.username }}</span>
+              <div class="ui mini circular image">
+                <img src="{% static 'images/anon.png'%}" alt="" />
+              </div>
+            </h5>
+          </div>
+          <div class="item">
+            <a href="{% url 'logout' %}" class="ui inverted circular button">登出</a>
+          </div>
+        </div>
+    </div>
+
+    <div class="container">
+      <div class="ui menu">
+
+        <div class="item"><i class="database icon"></i></div>
+          <div class="ui simple dropdown item">
+            公告
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <a class="item" href="{% url 'index'%}">公告</a>
+              <a class="item" href="{% url 'edit_page' %}">编辑模式</a>
+            </div>
+          </div>
+          <a class="item" href="{% url 'table_page'%}">课表查询</a>
+          <div class="ui simple dropdown item">
+            #作业
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <a class="item">#作业管理 </a>
+            </div>
+          </div>
+          <a class="item" >#出勤查询</a>
+          <a class="item" href="{% url 'aboutme'%}">关于本站</a>
+
+        <div class="right menu">
+          <div class="item">
+              <a class="ui primary button" href="{% url 'register' %}">注册</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ui raised text container segment" >
+        本站开发基于Python Django，前端框架使用了Semantic UI，Vue.js、Reqwest.js。 <br>
+        数据库使用了SQLite，MongoDB。<br>
+        服务器端使用了Nginx，uWsgi。<br>
+        本站所有资源数据均来自互联网，本站仅作为学习成果展示使用。<br><br>
+
+        <h3>Relzhao</h1>
+
+      </div>
+      <br><br>
+</div>
+
+
+
+
+  </body>
+</html>

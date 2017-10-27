@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+{% load staticfiles%}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    <script src="{% static 'js/vue1.js'%}"></script>
+    <script src="{% static 'js/semantic.js' %}"></script>
+    <script src="{% static 'js/reqwest.js' %}">
+    </script>
+    <link rel="stylesheet" href="{% static 'css/semantic.css' %}"/>
+    <style type="text/css">
+      .ui.right.floated.ui.primary.button{
+          margin-right: 0.3em;
+          margin-left: 0.25em;
+      }
+
+      .ui.inverted.basic.borderless.menu{
+          margin: 0em 0em;
+      }
+
+        h1 {color: white}
+
+      .bordered.inverted.grey.edit.icon{
+          padding: 0.3em 0.3em 0.3em 0.3em !important;
+          width: 1.5em;
+          height: 1.5em;
+      }
+      .bordered.inverted.grey.icon.close{
+          padding: 0.3em 0.3em 0.3em 0.3em !important;
+          width: 1.5em;
+          height: 1.5em;
+      }
+
+    </style>
+  </head>
+
+
+<body id="app">
+  <div class="ui inverted  basic borderless segment menu">
+      <div class="header item">
+          <div class="ui header">
+              <h1 style="font">学生信息管理系统</h1>
+          </div>
+      </div>
+      <div class="right menu">
+        <div class="item">
+          <h5 class="ui inverted header">
+            <span style="margin-right:20px;">{{ request.user.username }}</span>
+            <div class="ui mini circular image">
+              <img src="{% static 'images/anon.png'%}" alt="" />
+            </div>
+          </h5>
+        </div>
+        <div class="item">
+          <a href="{% url 'logout' %}" class="ui inverted circular button">登出</a>
+        </div>
+      </div>
+  </div>
+
+  <div class="container">
+    <div class="ui menu">
+
+      <div class="item"><i class="database icon"></i></div>
+        <div class="ui simple dropdown item">
+          公告
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <a class="item" href="{% url 'index'%}">公告</a>
+            <a class="item" href="{% url 'edit_page' %}">编辑模式</a>
+          </div>
+        </div>
+        <a class="item" href="{% url 'table_page'%}">课表查询</a>
+        <div class="ui simple dropdown item">
+          #作业
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <a class="item">#作业管理 </a>
+          </div>
+        </div>
+        <a class="item" >#出勤查询</a>
+        <a class="item" href="{% url 'aboutme'%}">关于本站</a>
+
+      <div class="right menu">
+        <div class="item">
+            <a class="ui primary button" href="{% url 'register' %}">注册</a>
+        </div>
+      </div>
+
+    </div>
+  {% verbatim %}
+
+
+
+  <div class="ui container segment">
+
+  <div v-for="info in infos">
+    <span class="ui header">{{ info.title }}
+      <span v-show="editorMode" class="shortcut buttons" style="padding:0.2em 0.3em 0.2em 0.3em;">
+        <i class="bordered inverted grey edit icon" v-on:click="editinfo(info)" v-bind:title="status.edit_status".></i>
+        <i class="bordered inverted grey icon close" v-on:click="deletedata(info)" v-bind:title="status.remove_status"></i>
+      </span>
+    </span>
+    <div class="ui hidden divider"></div>
+    <p>{{ info.content }}</p>
+    <div class="ui divider"></div>
+    <br>
+  </div>
+
+
+  <div class="ui active page dimmer" v-if="!modal.show" >
+    <div class="ui active modal">
+      <div class="ui container segment">
+        <div  class="ui warning form">
+          <div class="ui message">
+          <div class="header">数据无价，谨慎操作</div>
+          </div>
+          <div class="content">
+            <div class="field">
+              <label>标题</label>
+              <textarea v-model="modal.title" rows="2">{{ message.title }}</textarea>
+            </div>
+            <div class="field">
+              <label>正文</label>
+              <textarea v-model="modal.content" >{{ message.content }}</textarea>
+
+            </div>
+            <button v-on:click="senddata" class="ui blue button" type="button" >提交</button>
+            <button v-on:click="modal.show = !modal.show" class="ui button" type="button" >关闭</button>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui active page dimmer" v-if="!modal.luss" >
+      <div class="ui active modal">
+        <div class="ui container segment">
+          <div  class="ui warning form">
+            <div class="ui message">
+            <div class="header">数据无价，谨慎操作</div>
+            </div>
+            <div class="content">
+              <div class="field">
+                <label>标题</label>
+                <textarea v-model="modal.title" rows="2">{{ message.title }}</textarea>
+              </div>
+              <div class="field">
+                <label>正文</label>
+                <textarea v-model="modal.content" >{{ message.content }}</textarea>
+
+              </div>
+              <button v-on:click="postdata" class="ui blue button" type="button" >提交</button>
+              <button v-on:click="modal.luss = !modal.luss" class="ui button" type="button" >关闭</button>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </div>
+</div>
+
+
+</div>
+<script>
+
+var vm = new Vue({
+    el:"#app",
+    data:{
+      editorMode:true,
+      modal:{
+        title:'',
+        content:'',
+        show:true,
+        luss:true
+      },
+      status:{
+        edit_status:'编辑',
+        remove_status:'删除'
+      },
+      infos:[],
+      message:[],
+      forpost:{
+        title:'',
+        content:'',
+      }
+    },
+
+    methods:{
+      modeswitch:function () {
+        this.modal.luss = !this.modal.luss
+      },
+      modalSwitch:function () {
+        this.modal.show = !this.modal.show
+      },
+      get_info:function () {
+        var self = this;
+        reqwest({
+          url:"http://localhost:8000/api/article/",
+          type:"json",
+          success:function (resp) {
+            self.infos = resp
+                }
+            })
+        },
+      editinfo:function (vid) {
+        var self = this;
+        var id = vid.id;
+        self.modalSwitch()
+        self.justforone(vid)
+        },
+      justforone:function (info) {
+        var self = this;
+        var id = info.id;
+        reqwest({
+          url:"/api/article/" + id,
+          type:"json",
+          success:function (resp) {
+            self.message = resp
+            self.get_info()
+                }
+            })
+        },
+      senddata:function(){
+        var self = this;
+        var id = self.message.id
+        self.modalSwitch()
+        reqwest({
+          url:'http://localhost:8000/api/article/'+ id,
+          type:'json',
+          method:'put',
+          data:{
+              title:self.modal.title,
+              content:self.modal.content,
+          },
+        success:function(resp){
+          console.log(resp)
+          self.get_info()
+        },
+        error:function (err) {
+        console.log(err);
+    }
+      })
+    },
+    deletedata:function(info){
+      var self = this;
+      var id = info.id
+      reqwest({
+        url:'/api/article/'+id,
+        type:'json',
+        method:'delete',
+        success:function(resp){
+          console.log(resp)
+          self.get_info()
+        }
+      })
+
+    },
+    postdata:function(){
+      var self = this;
+      self.modeswitch()
+      reqwest({
+        url:'http://localhost:8000/api/article/',
+        method:'post',
+        type:'json',
+        data:{
+            title:self.modal.title,
+            content:self.modal.content,
+        },
+      success:function(resp){
+        console.log(resp)
+        self.get_info()
+      }
+      })
+    }
+      },
+          computed:{
+
+          },
+          ready:function () {
+            this.get_info()
+          }
+        })
+</script>
+</body>
+  {% endverbatim %}
+</html>
